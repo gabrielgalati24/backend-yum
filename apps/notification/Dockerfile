@@ -4,7 +4,9 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install 
+RUN npm install ts-loader
+RUN npm install -g @nestjs/cli
 
 COPY . .
 
@@ -19,7 +21,9 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install --only=production
+RUN npm install 
+RUN npm install ts-loader
+RUN npm install -g @nestjs/cli
 
 COPY . .
 
