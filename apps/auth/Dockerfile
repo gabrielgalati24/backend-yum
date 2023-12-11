@@ -1,3 +1,4 @@
+# Etapa de desarrollo
 FROM node:20-alpine AS development
 
 WORKDIR /usr/src/app
@@ -14,6 +15,7 @@ RUN npm run build auth
 
 RUN npx prisma generate
 
+# Etapa de producción
 FROM node:20-alpine AS production
 
 ARG NODE_ENV=production
@@ -27,10 +29,7 @@ RUN npm install
 RUN npm install ts-loader
 RUN npm install -g @nestjs/cli
 
-
-
 RUN npx prisma generate
-
 
 COPY . .
 

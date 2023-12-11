@@ -10,7 +10,7 @@ RUN npm install -g @nestjs/cli
 
 COPY . .
 
-RUN npm run build auth
+RUN npm run build orders
 
 FROM node:20-alpine AS production
 
@@ -29,4 +29,4 @@ COPY . .
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/apps/auth/main"]
+CMD ["node", "dist/apps/orders/main"]

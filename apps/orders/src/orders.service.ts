@@ -35,9 +35,9 @@ export class OrdersService {
     }
   }
 
-  async getOrders(): Promise<any> {
+  async getOrders(): Promise<Order[]> {
     try {
-      let orders = await this.cache.get('orders');
+      let orders = await this.cache.get('orders') as Order[];
       if (!orders) {
         orders = await this.prisma.order.findMany({
           include: {
@@ -47,16 +47,16 @@ export class OrdersService {
         });
         await this.cache.set('orders', orders);
       }
-      return orders;
+      return orders
     } catch (error) {
       console.error(error);
       throw new HttpException('No se pudieron obtener los pedidos', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async getOrderById(id: number): Promise<any> {
+  async getOrderById(id: number): Promise<Order> {
     try {
-      let order = await this.cache.get(`order:${id}`);
+      let order = await this.cache.get(`order:${id}`) as Order
       if (!order) {
         order = await this.prisma.order.findUnique({
           where: {
@@ -72,11 +72,11 @@ export class OrdersService {
       return order;
     } catch (error) {
       console.error(error);
-      throw new HttpException('No se pudo obtener el pedido', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException('No se pudo obener el pedido', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async updateOrder(id: number, updateOrderDto: any): Promise<any> {
+  async updateOrder(id: number, updateOrderDto: any): Promise<Order> {
     try {
       const { delivered = false, ...rest } = updateOrderDto;
 
@@ -116,9 +116,9 @@ export class OrdersService {
   }
 
 
-  async getOrdersByUser(userId: number): Promise<any> {
+  async getOrdersByUser(userId: number): Promise<Order[]> {
     try {
-      let orders = await this.cache.get(`orders:${userId}`);
+      let orders = await this.cache.get(`orders:${userId}`) as Order[]
       if (!orders) {
         orders = await this.prisma.order.findMany({
           where: {
@@ -138,10 +138,10 @@ export class OrdersService {
     }
   }
 
-  async getOrdersActiveByUser(userId: number): Promise<any> {
+  async getOrdersActiveByUser(userId: number): Promise<Order[]> {
     try {
-      // let orders = await this.cache.get(`orders:${userId}`);
-      let orders = await this.cache.get(`orders-active:${userId}`);
+
+      let orders = await this.cache.get(`orders-active:${userId}`) as Order[]
       if (!orders) {
         orders = await this.prisma.order.findMany({
           where: {

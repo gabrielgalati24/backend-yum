@@ -7,7 +7,7 @@ import { RedisCacheService } from '../../../common/services/redis-cache.service'
 export class ProductsService {
   constructor(private prisma: PrismaService, private readonly cache: RedisCacheService) { }
 
-  async getProducts(): Promise<any> {
+  async getProducts() {
     try {
 
       let products = await this.cache.get('products');
@@ -22,7 +22,7 @@ export class ProductsService {
     }
   }
 
-  async createProduct(createProductDto): Promise<any> {
+  async createProduct(createProductDto) {
     try {
       const { name, price } = createProductDto;
       const product = await this.prisma.product.create({
@@ -40,7 +40,7 @@ export class ProductsService {
     }
   }
 
-  async getProductById(id): Promise<any> {
+  async getProductById(id: number) {
     try {
       let product = await this.cache.get(`product:${id}`);
       if (!product) {
@@ -58,7 +58,7 @@ export class ProductsService {
     }
   }
 
-  async updateProduct(id, updateProductDto: CreateProductDto): Promise<any> {
+  async updateProduct(id: number, updateProductDto: CreateProductDto) {
     try {
       const { name, price } = updateProductDto;
       const product = await this.prisma.product.update({
