@@ -15,7 +15,7 @@ docker-compose up
   - URL: `http://localhost:3004/api/v1/products`
 
 - POST crear un producto: 
-  - URL: `http://localhost:3004/api/v1/orders/create`
+  - URL: `http://localhost:3004/api/v1/products/create`
   - Body:
     ```json
     {
