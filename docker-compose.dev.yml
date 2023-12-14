@@ -12,10 +12,24 @@ services:
   postgres:
     container_name: postgres
     image: postgres:latest
+    restart: always
     ports:
       - '5432:5432'
     environment:
       POSTGRES_PASSWORD: mysecretpassword
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    container_name: nest-pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: mysecretpassword
+
+    ports:
+      - '5050:80'
+    depends_on:
+      - postgres
 
   redis:
     container_name: redis
@@ -34,12 +48,11 @@ services:
       - redis
     volumes:
       - .:/usr/src/app 
-      - /usr/src/app/node_modules
     
     command: >
       /bin/sh -c "
       while ! nc -z postgres 5432; do sleep 1; done;
-      npx prisma migrate deploy && npm run start:dev auth
+      npx prisma migrate deploy && npx prisma generate && npm run start:dev auth
       "
 
 

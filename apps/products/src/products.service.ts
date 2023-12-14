@@ -9,10 +9,18 @@ export class ProductsService {
 
   async getProducts() {
     try {
-
+      // const x = this.prisma.shop.findMany();
+      // console.log(x);
+      console.log('getProducts');
       let products = await this.cache.get('products');
       if (!products) {
-        products = await this.prisma.product.findMany();
+        products = await this.prisma.product.findMany(
+          {
+            include: {
+              shop: true
+            }
+          }
+        );
         await this.cache.set('products', products);
       }
       return products;
@@ -77,6 +85,22 @@ export class ProductsService {
     } catch (error) {
       console.error(error);
       throw new HttpException('No se pudo actualizar el producto', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  async createShop(createProductDto: any) {
+    try {
+      const { name } = createProductDto;
+      const product = await this.prisma.shop.create({
+        data: {
+          name,
+        }
+      });
+      // Invalidate the cache after a product is created
+      await this.cache.del('products');
+      return product;
+    } catch (error) {
+      console.error(error);
+      throw new HttpException('No se pudo crear el producto', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
