@@ -23,6 +23,14 @@ model Order {
   delivered Boolean @default(false)
 }
 
+model Shop {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  name      String
+  products  Product[]
+}
+
 model Product {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -30,6 +38,8 @@ model Product {
   name      String
   price     Int
   orders    Order[]
+  shop      Shop     @relation(fields: [shopId], references: [id])
+  shopId    Int
 }
 
 model User {

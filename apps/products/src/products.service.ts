@@ -7,12 +7,20 @@ import { RedisCacheService } from '../../../common/services/redis-cache.service'
 export class ProductsService {
   constructor(private prisma: PrismaService, private readonly cache: RedisCacheService) { }
 
-  async getProducts(): Promise<any> {
+  async getProducts() {
     try {
-
+      // const x = this.prisma.shop.findMany();
+      // console.log(x);
+      console.log('getProducts');
       let products = await this.cache.get('products');
       if (!products) {
-        products = await this.prisma.product.findMany();
+        products = await this.prisma.product.findMany(
+          {
+            include: {
+              shop: true
+            }
+          }
+        );
         await this.cache.set('products', products);
       }
       return products;
@@ -22,7 +30,7 @@ export class ProductsService {
     }
   }
 
-  async createProduct(createProductDto): Promise<any> {
+  async createProduct(createProductDto) {
     try {
       const { name, price } = createProductDto;
       const product = await this.prisma.product.create({
@@ -40,7 +48,7 @@ export class ProductsService {
     }
   }
 
-  async getProductById(id): Promise<any> {
+  async getProductById(id: number) {
     try {
       let product = await this.cache.get(`product:${id}`);
       if (!product) {
@@ -58,7 +66,7 @@ export class ProductsService {
     }
   }
 
-  async updateProduct(id, updateProductDto: CreateProductDto): Promise<any> {
+  async updateProduct(id: number, updateProductDto: CreateProductDto) {
     try {
       const { name, price } = updateProductDto;
       const product = await this.prisma.product.update({
@@ -77,6 +85,22 @@ export class ProductsService {
     } catch (error) {
       console.error(error);
       throw new HttpException('No se pudo actualizar el producto', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  async createShop(createProductDto: any) {
+    try {
+      const { name } = createProductDto;
+      const product = await this.prisma.shop.create({
+        data: {
+          name,
+        }
+      });
+      // Invalidate the cache after a product is created
+      await this.cache.del('products');
+      return product;
+    } catch (error) {
+      console.error(error);
+      throw new HttpException('No se pudo crear el producto', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
