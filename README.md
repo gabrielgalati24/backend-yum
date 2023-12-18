@@ -21,7 +21,7 @@ docker-compose -f docker-compose.dev.yml up
     - Body:
     ```json
     {
-      "name": "test",
+      "name": "test"
    
     }
     ```
