@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { ClientProxy, Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
@@ -13,6 +13,7 @@ export class ProductsController {
   }
 
   @Post("/v1/products/create")
+  @UsePipes(new ValidationPipe())
   async createProduct(@Body() createProductDto: CreateProductDto) {
     return await this.productsService.createProduct(createProductDto);
   }

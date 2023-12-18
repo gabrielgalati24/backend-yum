@@ -16,13 +16,24 @@ docker-compose -f docker-compose.dev.yml up
 - GET todos los Productos: 
   - URL: `http://localhost:3004/api/v1/products`
 
+- POST crear un Shop:
+  - URL: `http://localhost:3004/api/v1/shop/create`
+    - Body:
+    ```json
+    {
+      "name": "test",
+   
+    }
+    ```
+
 - POST crear un producto: 
   - URL: `http://localhost:3004/api/v1/products/create`
   - Body:
     ```json
     {
       "name": "sushi",
-      "price": 15
+      "price": 15,
+      "shopId": 1
     }
     ```
 
