@@ -1,10 +1,16 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'common/database/prisma.service';
 import { CreateOrderDto } from '../dto/create-order.dto';
-import { Order } from '@prisma/client';
+
 import { ClientProxy } from '@nestjs/microservices';
 import { RedisCacheService } from 'common/services/redis-cache.service';
 
+interface Order {
+  id: number;
+  delivered: boolean;
+  userId: number;
+  productId: number;
+}
 @Injectable()
 export class OrdersService {
   constructor(private prisma: PrismaService, @Inject('AUTH_CLIENT') private readonly client: ClientProxy, private readonly cache: RedisCacheService) { }

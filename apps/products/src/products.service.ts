@@ -30,9 +30,9 @@ export class ProductsService {
     }
   }
 
-  async createProduct(createProductDto) {
+  async createProduct(createProductDto: CreateProductDto) {
     try {
-      const { name, price, shopId } = createProductDto;
+      const { name, price, shopId = 1 } = createProductDto;
       const product = await this.prisma.product.create({
         data: {
           name,
@@ -90,7 +90,7 @@ export class ProductsService {
   }
   async createShop(createProductDto: any) {
     try {
-      const { name } = createProductDto;
+      const { name = "test" } = createProductDto;
       const product = await this.prisma.shop.create({
         data: {
           name,

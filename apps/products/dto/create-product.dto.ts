@@ -11,4 +11,9 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsNumber()
     price: number;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsNumber()
+    shopId?: number;
 }
