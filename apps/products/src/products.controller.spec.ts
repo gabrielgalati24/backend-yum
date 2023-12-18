@@ -39,7 +39,7 @@ describe('ProductsController', () => {
 
   describe('getProducts', () => {
     it('should return an array of products', async () => {
-      const products: any = [{ id: 1, name: 'Product 1', price: 100 }, { id: 2, name: 'Product 2', price: 200 }];
+      const products: any = [{ id: 1, name: 'Product 1', price: 100, shopId: 1 }, { id: 2, name: 'Product 2', price: 200, shopId: 1 }];
       jest.spyOn(service, 'getProducts').mockResolvedValue(products);
 
       const result = await controller.getProducts();
@@ -50,8 +50,8 @@ describe('ProductsController', () => {
   });
 
   it('should create a new product', async () => {
-    const createProductDto = { name: 'New Product', price: 100 };
-    const createdProduct = { id: 1, name: 'New Product', price: 100 };
+    const createProductDto = { name: 'New Product', price: 100, shopId: 1 };
+    const createdProduct = { id: 1, name: 'New Product', price: 100, shopId: 1, createdAt: new Date(), updatedAt: new Date() };
     jest.spyOn(service, 'createProduct').mockResolvedValue(createdProduct);
 
     const result = await controller.createProduct(createProductDto);

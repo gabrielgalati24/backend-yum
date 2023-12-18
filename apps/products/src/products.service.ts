@@ -32,11 +32,12 @@ export class ProductsService {
 
   async createProduct(createProductDto) {
     try {
-      const { name, price } = createProductDto;
+      const { name, price, shopId } = createProductDto;
       const product = await this.prisma.product.create({
         data: {
           name,
-          price
+          price,
+          shopId
         }
       });
       // Invalidate the cache after a product is created
