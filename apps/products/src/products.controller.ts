@@ -2,7 +2,7 @@ import { Body, Controller, Get, Inject, Param, Patch, Post, UsePipes, Validation
 import { ProductsService } from './products.service';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { ClientProxy, Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
-
+import { CreateShopDto } from '../dto/create-shop.dto';
 @Controller("api")
 export class ProductsController {
   constructor(private readonly productsService: ProductsService, @Inject('AUTH_CLIENT') private readonly client: ClientProxy) { }
@@ -18,8 +18,8 @@ export class ProductsController {
     return await this.productsService.createProduct(createProductDto);
   }
   @Post("/v1/shop/create")
-  async createShop(@Body() createProductDto: any) {
-    return await this.productsService.createShop(createProductDto);
+  async createShop(@Body() createShopDto: CreateShopDto) {
+    return await this.productsService.createShop(createShopDto);
   }
   @Get("/v1/products/:id")
   async getProductById(@Param('id') id: number) {
