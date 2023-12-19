@@ -1,14 +1,4 @@
-version: '3.6'
-
 services:
-
-  nestjs-rabbitmq:
-    container_name: nestjs-rabbitmq
-    image: rabbitmq:3-management
-    ports:
-      - '5672:5672'
-      - '15672:15672'
-
   postgres:
     container_name: postgres
     image: postgres:latest
@@ -22,21 +12,19 @@ services:
     image: redis:latest
     ports:
       - '6379:6379'
+
+  nestjs-rabbitmq:
+    container_name: nestjs-rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
   auth:
     build:
       context: .
-      target: development
       dockerfile: ./apps/auth/Dockerfile
-    env_file:
-      - ./apps/orders/.env
-    depends_on:
-      - nestjs-rabbitmq
-      - postgres
-      - redis
-    volumes:
-      - .:/usr/src/app 
-      - /usr/src/app/node_modules
-
+      target: development
     command: >
       /bin/sh -c "
       while ! nc -z postgres 5432; do sleep 1; done;
@@ -44,76 +32,81 @@ services:
       "
     ports:
       - '3001:3001'
-
-  notification:
-    build:
-      context: .
-      dockerfile: ./apps/notification/Dockerfile
-      target: development
     env_file:
-      - ./apps/notification/.env
+      - ./apps/auth/.env
     depends_on:
-      - nestjs-rabbitmq
       - postgres
       - redis
-      - auth
+      - nestjs-rabbitmq
     volumes:
-      - .:/usr/src/app 
+      - .:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run start:dev notification
-
-    ports:
-      - '3005:3005'
 
   orders:
     build:
       context: .
       dockerfile: ./apps/orders/Dockerfile
       target: development
+    command: >
+      /bin/sh -c "
+      while ! nc -z postgres 5432; do sleep 1; done;
+      npx prisma migrate deploy && npx prisma generate && npm run start:dev orders
+      "
     env_file:
       - ./apps/orders/.env
     depends_on:
-      - nestjs-rabbitmq
       - postgres
-      - redis
       - auth
+      - redis
+      - nestjs-rabbitmq
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-      
-    command: npm run start:dev orders
     ports:
       - '3003:3003'
+
+  notification:
+    build:
+      context: .
+      dockerfile: ./apps/notification/Dockerfile
+      target: development
+    command: >
+      /bin/sh -c "
+      while ! nc -z postgres 5432; do sleep 1; done;
+      npx prisma migrate deploy && npx prisma generate && npm run start:dev notification
+      "
+    ports:
+      - '3005:3005'
+    env_file:
+      - ./apps/notification/.env
+    depends_on:
+      - postgres
+      - auth
+      - redis
+      - nestjs-rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
   products:
     build:
       context: .
       dockerfile: ./apps/products/Dockerfile
       target: development
+    command: >
+      /bin/sh -c "
+      while ! nc -z postgres 5432; do sleep 1; done;
+      npx prisma migrate deploy && npx prisma generate && npm run start:dev products
+      "
+    ports:
+      - '3004:3004'
     env_file:
       - ./apps/products/.env
     depends_on:
-      - nestjs-rabbitmq
       - postgres
-      - redis
       - auth
+      - redis
+      - nestjs-rabbitmq
     volumes:
-      - .:/usr/src/app 
+      - .:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run start:dev products
-    ports:
-      - '3004:3004'
-  # prometheus:
-  #   container_name: prometheus
-  #   image: prom/prometheus:latest
-  #   volumes:
-  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
-  #   command:
-  #     - '--config.file=/etc/prometheus/prometheus.yml'
-  #   ports:
-  #     - '9090:9090'
-
-  # grafana:
-  #   container_name: grafana
-  #   image: grafana/grafana:latest
-  #   ports:
-  #     - '3030:3000'
