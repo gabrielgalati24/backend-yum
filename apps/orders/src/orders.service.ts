@@ -13,7 +13,11 @@ interface Order {
 }
 @Injectable()
 export class OrdersService {
-  constructor(private prisma: PrismaService, @Inject('AUTH_CLIENT') private readonly client: ClientProxy, private readonly cache: RedisCacheService) { }
+  constructor(
+    private prisma: PrismaService,
+    @Inject('AUTH_CLIENT') private readonly client: ClientProxy,
+    private readonly cache: RedisCacheService,
+  ) {}
 
   async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
     try {
@@ -37,48 +41,57 @@ export class OrdersService {
       return order;
     } catch (error) {
       console.error(error);
-      throw new HttpException('No se pudo crear el pedido', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'No se pudo crear el pedido',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async getOrders(): Promise<Order[]> {
     try {
-      let orders = await this.cache.get('orders') as Order[];
+      let orders = (await this.cache.get('orders')) as Order[];
       if (!orders) {
         orders = await this.prisma.order.findMany({
           include: {
             product: true,
-            user: true
-          }
+            user: true,
+          },
         });
         await this.cache.set('orders', orders);
       }
-      return orders
+      return orders;
     } catch (error) {
       console.error(error);
-      throw new HttpException('No se pudieron obtener los pedidos', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'No se pudieron obtener los pedidos',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async getOrderById(id: number): Promise<Order> {
     try {
-      let order = await this.cache.get(`order:${id}`) as Order
+      let order = (await this.cache.get(`order:${id}`)) as Order;
       if (!order) {
         order = await this.prisma.order.findUnique({
           where: {
-            id: +id
+            id: +id,
           },
           include: {
             product: true,
-            user: true
-          }
+            user: true,
+          },
         });
         await this.cache.set(`order:${id}`, order);
       }
       return order;
     } catch (error) {
       console.error(error);
-      throw new HttpException('No se pudo obener el pedido', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'No se pudo obener el pedido',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -88,26 +101,25 @@ export class OrdersService {
 
       const currentOrder = await this.prisma.order.findUnique({
         where: {
-          id: +id
-        }
+          id: +id,
+        },
       });
-
 
       const order = await this.prisma.order.update({
         where: {
-          id: +id
+          id: +id,
         },
         data: {
           delivered,
-          ...rest
-        }
+          ...rest,
+        },
       });
 
       // Si el pedido no estaba entregado emite el evento order_delivered para enviar la factura
       if (delivered && !currentOrder.delivered) {
         console.log('Emitting order_delivered event');
         this.client.emit('order_delivered', {
-          orderId: id
+          orderId: id,
         });
       }
 
@@ -117,54 +129,61 @@ export class OrdersService {
       return order;
     } catch (error) {
       console.error(error);
-      throw new HttpException('No se pudo actualizar el pedido', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'No se pudo actualizar el pedido',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-
   async getOrdersByUser(userId: number): Promise<Order[]> {
     try {
-      let orders = await this.cache.get(`orders:${userId}`) as Order[]
+      let orders = (await this.cache.get(`orders:${userId}`)) as Order[];
       if (!orders) {
         orders = await this.prisma.order.findMany({
           where: {
-            userId: +userId
+            userId: +userId,
           },
           include: {
             product: true,
-            user: true
-          }
+            user: true,
+          },
         });
         await this.cache.set(`orders:${userId}`, orders);
       }
       return orders;
     } catch (error) {
       console.error(error);
-      throw new HttpException('No se pudieron obtener los pedidos', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'No se pudieron obtener los pedidos',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async getOrdersActiveByUser(userId: number): Promise<Order[]> {
     try {
-
-      let orders = await this.cache.get(`orders-active:${userId}`) as Order[]
+      let orders = (await this.cache.get(`orders-active:${userId}`)) as Order[];
       if (!orders) {
         orders = await this.prisma.order.findMany({
           where: {
             userId: +userId,
-            delivered: false
+            delivered: false,
           },
           include: {
             product: true,
-            user: true
-          }
+            user: true,
+          },
         });
         await this.cache.set(`orders-active:${userId}`, orders);
       }
       return orders;
     } catch (error) {
       console.error(error);
-      throw new HttpException('No se pudieron obtener los pedidos', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'No se pudieron obtener los pedidos',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

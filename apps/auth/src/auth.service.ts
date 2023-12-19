@@ -1,11 +1,17 @@
-import { ConflictException, HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'common/database/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async login(createUserDto): Promise<any> {
     try {
@@ -27,27 +33,36 @@ export class AuthService {
       };
     } catch (error) {
       console.error(error);
-      throw new HttpException('No se pudo iniciar sesión', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'No se pudo iniciar sesión',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   async register(createUserDto): Promise<any> {
     try {
-      const { email, password, name = "" } = createUserDto;
+      const { email, password, name = '' } = createUserDto;
       const user = await this.prisma.user.create({
         data: {
           name,
           password,
-          email
+          email,
         },
       });
       return user;
     } catch (error) {
       console.error(error);
-      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('El correo electrónico ya existe');
       }
-      throw new HttpException('No se pudo registrar el usuario', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'No se pudo registrar el usuario',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

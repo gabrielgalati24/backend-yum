@@ -8,4 +8,4 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build notification
+RUN npm run build billing

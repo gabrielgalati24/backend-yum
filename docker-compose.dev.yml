@@ -24,18 +24,18 @@ services:
       - '6379:6379'
   auth:
     build:
-      context: ./
+      context: .
       target: development
       dockerfile: ./apps/auth/Dockerfile
     env_file:
-      - .env
+      - ./apps/orders/.env
     depends_on:
       - nestjs-rabbitmq
       - postgres
       - redis
     volumes:
       - .:/usr/src/app 
-      
+      - /usr/src/app/node_modules
 
     command: >
       /bin/sh -c "
@@ -47,11 +47,11 @@ services:
 
   notification:
     build:
-      context: ./
+      context: .
       dockerfile: ./apps/notification/Dockerfile
       target: development
     env_file:
-      - .env
+      - ./apps/notification/.env
     depends_on:
       - nestjs-rabbitmq
       - postgres
@@ -59,7 +59,7 @@ services:
       - auth
     volumes:
       - .:/usr/src/app 
-      
+      - /usr/src/app/node_modules
     command: npm run start:dev notification
 
     ports:
@@ -67,29 +67,30 @@ services:
 
   orders:
     build:
-      context: ./
+      context: .
       dockerfile: ./apps/orders/Dockerfile
       target: development
     env_file:
-      - .env
+      - ./apps/orders/.env
     depends_on:
       - nestjs-rabbitmq
       - postgres
       - redis
       - auth
     volumes:
-      - .:/usr/src/app 
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
       
     command: npm run start:dev orders
     ports:
       - '3003:3003'
   products:
     build:
-      context: ./
+      context: .
       dockerfile: ./apps/products/Dockerfile
       target: development
     env_file:
-      - .env
+      - ./apps/products/.env
     depends_on:
       - nestjs-rabbitmq
       - postgres
@@ -97,7 +98,7 @@ services:
       - auth
     volumes:
       - .:/usr/src/app 
-      
+      - /usr/src/app/node_modules
     command: npm run start:dev products
     ports:
       - '3004:3004'

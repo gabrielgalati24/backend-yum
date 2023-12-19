@@ -14,12 +14,11 @@ async function bootstrap() {
       urls: ['amqp://nestjs-rabbitmq:5672'],
       queue: 'auth_queue',
       queueOptions: {
-        durable: false
+        durable: false,
       },
     },
   });
   await app.startAllMicroservices();
   await app.listen(configService.get('PORT'));
-
 }
 bootstrap();
