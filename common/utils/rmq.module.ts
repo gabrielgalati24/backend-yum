@@ -28,7 +28,7 @@ export class RmqModule {
                     return ClientProxyFactory.create({
                         transport: Transport.RMQ,
                         options: {
-                            urls: [`amqp://${USER}:${PASSWORD}@${HOST}`],
+                            urls: [`amqp://nestjs-rabbitmq:5672`],
                             queue,
                             queueOptions: {
                                 durable: true,

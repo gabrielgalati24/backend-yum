@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: postgres
-    image: postgres:latest
+    image: postgres:alpine3.19
     ports:
       - '5432:5432'
     environment:
@@ -9,13 +9,13 @@ services:
 
   redis:
     container_name: redis
-    image: redis:latest
+    image: redis:alpine3.19
     ports:
       - '6379:6379'
 
   nestjs-rabbitmq:
     container_name: nestjs-rabbitmq
-    image: rabbitmq:3-management
+    image: rabbitmq:3.9.29-management-alpine
     ports:
       - '5672:5672'
       - '15672:15672'
@@ -65,28 +65,70 @@ services:
     ports:
       - '3003:3003'
 
-  notification:
-    build:
-      context: .
-      dockerfile: ./apps/notification/Dockerfile
-      target: development
-    command: >
-      /bin/sh -c "
-      while ! nc -z postgres 5432; do sleep 1; done;
-      npx prisma migrate deploy && npx prisma generate && npm run start:dev notification
-      "
-    ports:
-      - '3005:3005'
-    env_file:
-      - ./apps/notification/.env
-    depends_on:
-      - postgres
-      - auth
-      - redis
-      - nestjs-rabbitmq
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+  # notification:
+  #   build:
+  #     context: .
+  #     dockerfile: ./notification/Dockerfile
+  #     target: development
+  #   command: >
+  #     /bin/sh -c "
+  #     while ! nc -z postgres 5432; do sleep 1; done;
+  #     npx prisma migrate deploy && npx prisma generate && npm run start:dev notification
+  #     "
+  #   ports:
+  #     - '3005:3005'
+  #   env_file:
+  #     - ./apps/notification/.env
+  #   depends_on:
+  #     - postgres
+  #     - auth
+  #     - redis
+  #     - nestjs-rabbitmq
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+
+  api-gateway:
+      build:
+        context: .
+        dockerfile: ./apps/api-gateway/Dockerfile
+        target: development
+      command: >
+        /bin/sh -c "
+        while ! nc -z postgres 5432; do sleep 1; done;
+        npx prisma migrate deploy && npx prisma generate && npm run start:dev api-gateway 
+        "
+      ports:
+        - '3000:3000'
+      env_file:
+        - ./apps/api-gateway/.env
+      depends_on:
+        - postgres
+        - auth
+        - redis
+        - nestjs-rabbitmq
+      volumes:
+        - .:/usr/src/app
+        - /usr/src/app/node_modules
+
+  # notification:
+  #   build:
+  #     context: .
+  #     dockerfile: ./notification/Dockerfile
+  #     target: development
+  #   command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+  #   ports:
+  #     - '3005:3005'
+  #   env_file:
+  #     - ./notification/.env
+  #   depends_on:
+  #     - postgres
+  #     - auth
+  #     - redis
+  #     - nestjs-rabbitmq
+  #   volumes:
+  #     - .:/usr/src/app
+
 
   products:
     build:

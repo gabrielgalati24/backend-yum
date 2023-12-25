@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { BillingController } from './billing.controller';
-import { BillingService } from './billing.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { BillingController } from "./billing.controller";
+import { BillingService } from "./billing.service";
 
-describe('BillingController', () => {
+describe("BillingController", () => {
   let billingController: BillingController;
 
   beforeEach(async () => {
@@ -14,9 +14,9 @@ describe('BillingController', () => {
     billingController = app.get<BillingController>(BillingController);
   });
 
-  describe('root', () => {
+  describe("root", () => {
     it('should return "Hello World!"', () => {
-      expect(billingController.getHello()).toBe('Hello World!');
+      expect(billingController.getHello()).toBe("Hello World!");
     });
   });
 });

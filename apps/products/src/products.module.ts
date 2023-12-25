@@ -1,57 +1,50 @@
-import { Module } from '@nestjs/common';
-import { ProductsController } from './products.controller';
-import { ProductsService } from './products.service';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from 'common/database/prisma.service';
+import { Module } from "@nestjs/common";
+import { ProductsController } from "./products.controller";
+import { ProductsService } from "./products.service";
+import { ConfigModule } from "@nestjs/config";
+import { PrismaService } from "common/database/prisma.service";
 import {
   ClientProxyFactory,
   ClientsModule,
   Transport,
-} from '@nestjs/microservices';
-import { RedisModule } from 'common/modules/redis.module';
+} from "@nestjs/microservices";
+import { RedisModule } from "common/modules/redis.module";
+import { RabbitmqModule } from "common/modules/rabbitmq.module";
+import { RabbitmqService } from "common/services/rabbitmq.service";
+import { RabbitMqService } from "common/utils/rmq.service";
+
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: './apps/products/.env',
+      envFilePath: "./apps/products/.env",
     }),
-    ClientsModule.register([
-      {
-        name: 'AUTH_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://nestjs-rabbitmq:5672'],
-
-          queue: 'auth_queue',
-          queueOptions: {
-            durable: false,
-          },
-        },
-      },
-    ]),
+    RabbitmqModule,
+    RabbitmqModule.registerRmq("PRODUCTS_SERVICE", "products_queue"),
     RedisModule,
   ],
   controllers: [ProductsController],
   providers: [
     ProductsService,
     PrismaService,
+    RabbitMqService,
     {
-      provide: 'AUTH_CLIENT',
-      useFactory: () => {
-        return ClientProxyFactory.create({
-          transport: Transport.RMQ,
-          options: {
-            urls: ['amqp://nestjs-rabbitmq:5672'],
-
-            queue: 'auth_queue',
-            queueOptions: {
-              durable: false,
-            },
-          },
-        });
+      provide: "PRODUCTS_SERVICE",
+      useFactory: (rabbitmqService: RabbitMqService) => {
+        return rabbitmqService.getRmqOptions("products_queue");
       },
+      inject: [RabbitMqService],
     },
+
+    // {
+    //   provide: "PRODUCTS_SERVICE",
+    //   useFactory: (rabbitmqService: RabbitMqService) => {
+    //     return rabbitmqService.getRmqOptions("products_queue");
+    //   },
+    //   inject: [RabbitMqService],
+    // }
   ],
+  exports: [RabbitmqModule],
 })
-export class ProductsModule {}
+export class ProductsModule { }

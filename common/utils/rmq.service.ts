@@ -3,17 +3,15 @@ import { RmqContext, RmqOptions, Transport } from "@nestjs/microservices";
 
 @Injectable()
 export class RabbitMqService {
-    constructor(private readonly config) { }
+    constructor() { }
 
     getRmqOptions(queue: string): RmqOptions {
-        const USER = this.config.get('RABBITMQ_USER');
-        const PASSWORD = this.config.get('RABBITMQ_PASS');
-        const HOST = this.config.get('RABBITMQ_HOST');
+
 
         return {
             transport: Transport.RMQ,
             options: {
-                urls: [`amqp://${USER}:${PASSWORD}@${HOST}`],
+                urls: [`amqp://nestjs-rabbitmq:5672`],
                 noAck: false,
                 queue,
                 queueOptions: {

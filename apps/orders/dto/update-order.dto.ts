@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsNumber, IsString, IsBoolean } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsString, IsBoolean } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class UpdateOrderDto {
   @ApiProperty()
