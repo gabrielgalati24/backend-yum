@@ -5,6 +5,7 @@ import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
 import { RabbitMqService } from "common/utils/rmq.service";
+import { RabbitmqService } from "common/services/rabbitmq.service";
 async function bootstrap() {
   const app = await NestFactory.create(ProductsModule);
   const configService = app.get(ConfigService);
@@ -19,7 +20,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
-  const rabbitmq = app.get(RabbitMqService);
+  const rabbitmq = app.get(RabbitmqService);
   // await app.connectMicroservice<MicroserviceOptions>({ transport: Transport.RMQ, options: { urls: [configService.get("RABBITMQ_URL")], queue: configService.get("RABBITMQ_QUEUE"), queueOptions: { durable: false } } });
   app.connectMicroservice(rabbitmq.getRmqOptions("products_queue"));
   // app.connectMicroservice<MicroserviceOptions>({

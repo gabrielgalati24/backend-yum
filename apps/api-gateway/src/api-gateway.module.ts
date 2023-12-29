@@ -8,4 +8,4 @@ import { RabbitmqModule } from "common/modules/rabbitmq.module";
   imports: [RabbitmqModule.registerRmq("PRODUCTS_SERVICE", "products_queue")],
   controllers: [ApiGatewayController],
 })
-export class ApiGatewayModule {}
+export class ApiGatewayModule { }

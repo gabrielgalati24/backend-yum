@@ -28,22 +28,21 @@ import { RabbitMqService } from "common/utils/rmq.service";
   providers: [
     ProductsService,
     PrismaService,
-    RabbitMqService,
+
+    // RabbitmqService,
+
     {
       provide: "PRODUCTS_SERVICE",
-      useFactory: (rabbitmqService: RabbitMqService) => {
-        return rabbitmqService.getRmqOptions("products_queue");
-      },
-      inject: [RabbitMqService],
-    },
-
+      useClass: RabbitMqService,
+    }
     // {
-    //   provide: "PRODUCTS_SERVICE",
-    //   useFactory: (rabbitmqService: RabbitMqService) => {
-    //     return rabbitmqService.getRmqOptions("products_queue");
+    //   provide: RabbitMqService,
+    //   useFactory: (rabbitmqService: RabbitmqService) => {
+    //     return new RabbitMqService(rabbitmqService);
     //   },
-    //   inject: [RabbitMqService],
+    //   inject: [RabbitmqService],
     // }
+
   ],
   exports: [RabbitmqModule],
 })

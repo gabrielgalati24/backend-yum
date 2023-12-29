@@ -1,14 +1,16 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, UseFilters } from "@nestjs/common";
 import { PrismaService } from "../../../common/database/prisma.service";
 import { CreateProductDto } from "../dto/create-product.dto";
 import { RedisCacheService } from "../../../common/services/redis-cache.service";
-
+import { RpcException } from '@nestjs/microservices';
+import { HttpExceptionFilter } from "common/utils/httpError";
 @Injectable()
+// @UseFilters(new HttpExceptionFilter())
 export class ProductsService {
   constructor(
     private prisma: PrismaService,
     private readonly cache: RedisCacheService,
-  ) {}
+  ) { }
 
   async getProducts() {
     try {
@@ -28,8 +30,8 @@ export class ProductsService {
     } catch (error) {
       console.error(error);
       throw new HttpException(
-        "No se pudieron obtener los productos",
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        "No se pudieron obtener los productos" + error, HttpStatus.INTERNAL_SERVER_ERROR,
+
       );
     }
   }
@@ -37,6 +39,7 @@ export class ProductsService {
   async createProduct(createProductDto: CreateProductDto) {
     try {
       const { name, price, shopId = 1 } = createProductDto;
+      console.log({ name, price, shopId });
       const product = await this.prisma.product.create({
         data: {
           name,
@@ -49,10 +52,19 @@ export class ProductsService {
       return product;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudo crear el producto",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+
+      if (error.code === "P2003") {
+        throw new RpcException({
+          message: "La tienda no existe",
+          statusCode: 500,
+          error: error.message,
+        });
+      }
+      throw new RpcException({
+        message: 'No se pudo crear el producto',
+        statusCode: 500,
+        error: error.message,
+      });
     }
   }
 
@@ -70,9 +82,12 @@ export class ProductsService {
       return product;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudo obtener el producto",
-        HttpStatus.INTERNAL_SERVER_ERROR,
+      throw new RpcException({
+        message: 'No se pudo obtener el producto',
+        statusCode: 500,
+        error: error.message,
+      }
+
       );
     }
   }
@@ -95,10 +110,11 @@ export class ProductsService {
       return product;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudo actualizar el producto",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new RpcException({
+        message: 'No se pudo actualizar el producto',
+        statusCode: 500,
+        error: error.message,
+      });
     }
   }
   async createShop(createProductDto: any) {
@@ -114,10 +130,11 @@ export class ProductsService {
       return product;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudo crear el producto",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new RpcException({
+        message: 'No se pudo crear la tienda',
+        statusCode: 500,
+        error: error.message,
+      });
     }
   }
 }
