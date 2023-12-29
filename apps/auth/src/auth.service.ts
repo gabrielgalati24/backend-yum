@@ -5,13 +5,14 @@ import {
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
+import { RpcException } from "@nestjs/microservices";
 import { Prisma } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { PrismaService } from "common/database/prisma.service";
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async login(createUserDto): Promise<any> {
     try {
@@ -57,7 +58,12 @@ export class AuthService {
         error instanceof PrismaClientKnownRequestError &&
         error.code === "P2002"
       ) {
-        throw new ConflictException("El correo electrónico ya existe");
+        // throw new ConflictException("El correo electrónico ya existe");
+        throw new RpcException({
+          message: 'El correo electrónico ya existe',
+          statusCode: HttpStatus.CONFLICT,
+          error: error.message,
+        });
       }
       throw new HttpException(
         "No se pudo registrar el usuario",

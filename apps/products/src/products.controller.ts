@@ -24,9 +24,9 @@ import {
 import { CreateShopDto } from "../dto/create-shop.dto";
 import { RabbitMqService } from "common/utils/rmq.service";
 import { HttpExceptionFilter } from "common/utils/httpError";
-import { RpcExceptionFilter } from "common/utils/rcpError";
+import { RpcException } from "@nestjs/microservices";
 @Controller("api")
-@UseFilters(new RpcExceptionFilter())
+// @UseFilters(new RpcExceptionFilter())
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
@@ -44,27 +44,26 @@ export class ProductsController {
   @MessagePattern({ cmd: 'create-product' })
   async createProduct(@Ctx() context: RmqContext, @Payload() createProductDto: CreateProductDto) {
     this.RabbitMqService.acknowledgeMessage(context);
-    console.log({ createProductDto });
+
     return await this.productsService.createProduct(createProductDto);
   }
 
 
-  // @Post("/v1/shop/create")
+
   @MessagePattern({ cmd: 'create-shop' })
   async createShop(@Payload() createShopDto: CreateShopDto) {
-    console.log({ createShopDto });
+
     return await this.productsService.createShop(createShopDto);
   }
-  // @Get("/v1/products/:id")
+
   @MessagePattern({ cmd: 'get-product-by-id' })
   async getProductById(@Ctx() context: RmqContext, @Payload() id: number) {
-    console.log({ id });
+
     this.RabbitMqService.acknowledgeMessage(context);
-    console.log("getProductById");
+
     return await this.productsService.getProductById(+id);
   }
 
-  // @Patch("/v1/products/:id")
   @MessagePattern({ cmd: 'update-product' })
   async updateProduct(
     @Ctx() context: RmqContext,

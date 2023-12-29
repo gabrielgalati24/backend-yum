@@ -5,8 +5,6 @@ Stack: Nestjs, Rabbitmq, Redis, Postgresql
 Para ejecutar este proyecto,  necesitas tener Docker y Docker Compose instalados en tu máquina y node . Luego, puedes iniciar todos los servicios con estos comandos:
 
 ```bash
-npm install
-
 docker-compose -f docker-compose.dev.yml build
 
 docker-compose -f docker-compose.dev.yml up

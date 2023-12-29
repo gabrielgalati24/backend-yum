@@ -13,8 +13,8 @@ import {
 export class NotificationController {
   constructor(
     private readonly notificationService: NotificationService,
-    @Inject("AUTH_CLIENT") private readonly client: ClientProxy,
-  ) {}
+
+  ) { }
 
   @MessagePattern("email_notification")
   messageHello(@Payload() data: any, @Ctx() context: RmqContext): string {
@@ -22,10 +22,11 @@ export class NotificationController {
   }
   @MessagePattern("order_delivered")
   async orderDelivereds(
-    @Payload() data: any,
     @Ctx() context: RmqContext,
+    @Payload() data: any,
   ): Promise<any> {
     const { orderId } = data;
+    console.log("order_delivered", orderId);
     return this.notificationService.sendInvoice(orderId);
   }
 }

@@ -13,6 +13,7 @@ import {
 } from "@nestjs/microservices";
 import { RabbitMqService } from "common/utils/rmq.service";
 import { RmqModule } from "common/utils/rmq.module";
+import { RabbitmqModule } from "common/modules/rabbitmq.module";
 
 @Module({
   imports: [
@@ -20,39 +21,17 @@ import { RmqModule } from "common/utils/rmq.module";
       isGlobal: true,
       envFilePath: "./apps/auth/.env",
     }),
-    ClientsModule.register([
-      {
-        name: "AUTH_SERVICE",
-        transport: Transport.RMQ,
-        options: {
-          urls: ["amqp://nestjs-rabbitmq:5672"],
-          queue: "auth_queue",
-          queueOptions: {
-            durable: false,
-          },
-        },
-      },
-    ]),
+
+    RabbitmqModule.registerRmq("AUTH_SERVICE", "auth_queue"),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     PrismaService,
     {
-      provide: "AUTH_CLIENT",
-      useFactory: () => {
-        return ClientProxyFactory.create({
-          transport: Transport.RMQ,
-          options: {
-            urls: ["amqp://nestjs-rabbitmq:5672"],
-            queue: "auth_queue",
-            queueOptions: {
-              durable: false,
-            },
-          },
-        });
-      },
-    },
+      provide: "AUTH_SERVICE",
+      useClass: RabbitMqService,
+    }
   ],
 })
-export class AuthModule {}
+export class AuthModule { }

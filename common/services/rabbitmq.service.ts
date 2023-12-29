@@ -8,16 +8,17 @@ import { RabbitmqServiceInterface } from 'common/interface';
 
 @Injectable()
 export class RabbitmqService implements RabbitmqServiceInterface {
-    constructor() { }
+    constructor(private configService: ConfigService) { }
 
     getRmqOptions(queue: string): RmqOptions {
+
 
 
         return {
             transport: Transport.RMQ,
             options: {
                 // urls: [`amqp://${USER}:${PASSWORD}@${HOST}`],
-                urls: [`amqp://nestjs-rabbitmq:5672`],
+                urls: [this.configService.get<string>('RABBITMQ_URL')],
                 noAck: false,
                 queue,
                 queueOptions: {

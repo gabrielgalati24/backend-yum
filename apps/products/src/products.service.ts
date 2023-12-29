@@ -56,13 +56,13 @@ export class ProductsService {
       if (error.code === "P2003") {
         throw new RpcException({
           message: "La tienda no existe",
-          statusCode: 500,
+          statusCode: HttpStatus.NOT_FOUND,
           error: error.message,
         });
       }
       throw new RpcException({
         message: 'No se pudo crear el producto',
-        statusCode: 500,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         error: error.message,
       });
     }

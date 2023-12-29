@@ -29,19 +29,11 @@ import { RabbitMqService } from "common/utils/rmq.service";
     ProductsService,
     PrismaService,
 
-    // RabbitmqService,
 
     {
       provide: "PRODUCTS_SERVICE",
       useClass: RabbitMqService,
     }
-    // {
-    //   provide: RabbitMqService,
-    //   useFactory: (rabbitmqService: RabbitmqService) => {
-    //     return new RabbitMqService(rabbitmqService);
-    //   },
-    //   inject: [RabbitmqService],
-    // }
 
   ],
   exports: [RabbitmqModule],

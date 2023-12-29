@@ -21,18 +21,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
   const rabbitmq = app.get(RabbitmqService);
-  // await app.connectMicroservice<MicroserviceOptions>({ transport: Transport.RMQ, options: { urls: [configService.get("RABBITMQ_URL")], queue: configService.get("RABBITMQ_QUEUE"), queueOptions: { durable: false } } });
+
   app.connectMicroservice(rabbitmq.getRmqOptions("products_queue"));
-  // app.connectMicroservice<MicroserviceOptions>({
-  //   transport: Transport.RMQ,
-  //   options: {
-  //     urls: ["amqp://localhost:5672"],
-  //     queue: "products_queue",
-  //     queueOptions: {
-  //       durable: false,
-  //     },
-  //   },
-  // });
+
   await app.startAllMicroservices();
   await app.listen(configService.get("PORT"));
 }

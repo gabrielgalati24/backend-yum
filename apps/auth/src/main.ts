@@ -3,6 +3,7 @@ import { AuthModule } from "./auth.module";
 import { ConfigService } from "@nestjs/config";
 import { ValidationPipe } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { RabbitmqService } from "common/services/rabbitmq.service";
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   app.useGlobalPipes(new ValidationPipe());
@@ -17,7 +18,12 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
-  console.log(configService.get("PORT"));
+  const rabbitmq = app.get(RabbitmqService);
+
+  app.connectMicroservice(rabbitmq.getRmqOptions("auth_queue"));
+
+  await app.startAllMicroservices();
+
   await app.listen(configService.get("PORT"));
 }
 bootstrap();

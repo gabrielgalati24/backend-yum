@@ -2,9 +2,9 @@ import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "common/database/prisma.service";
 import { CreateOrderDto } from "../dto/create-order.dto";
 
-import { ClientProxy } from "@nestjs/microservices";
+import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { RedisCacheService } from "common/services/redis-cache.service";
-
+import { RabbitMqService } from "common/utils/rmq.service";
 interface Order {
   id: number;
   delivered: boolean;
@@ -15,9 +15,11 @@ interface Order {
 export class OrdersService {
   constructor(
     private prisma: PrismaService,
-    @Inject("AUTH_CLIENT") private readonly client: ClientProxy,
+
+    @Inject("NOTIFICATION_SERVICE") private readonly RabbitMqService: RabbitMqService,
     private readonly cache: RedisCacheService,
-  ) {}
+
+  ) { }
 
   async createOrder(createOrderDto: CreateOrderDto): Promise<Order> {
     try {
@@ -99,9 +101,6 @@ export class OrdersService {
     try {
       const { delivered = false, ...rest } = updateOrderDto;
 
-      this.client.emit("notifications_queue", {
-        orderId: id,
-      });
 
       console.log("Updating order", id, updateOrderDto);
       const currentOrder = await this.prisma.order.findUnique({
@@ -122,10 +121,11 @@ export class OrdersService {
 
       // Si el pedido no estaba entregado emite el evento order_delivered para enviar la factura
       if (delivered && !currentOrder.delivered) {
-        console.log("Emitting order_delivered event");
-        this.client.emit("notifications_queue", {
+
+        this.RabbitMqService.emit(this.RabbitMqService.client, "order_delivered", {
           orderId: id,
         });
+
       }
 
       // Invalida la cache despues de actualizar un pedido
@@ -134,10 +134,20 @@ export class OrdersService {
       return order;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudo actualizar el pedido",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      if (
+        error.code === "P2025"
+      ) {
+        throw new RpcException({
+          message: 'No se pudo actualizar el pedido porque no existe',
+          statusCode: HttpStatus.NOT_FOUND,
+          error: error.message,
+        });
+      }
+      throw new RpcException({
+        message: 'No se pudo actualizar el pedido',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: error.message,
+      })
     }
   }
 

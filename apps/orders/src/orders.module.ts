@@ -12,6 +12,8 @@ import { RedisModule } from "common/modules/redis.module";
 import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 import { LoggingInterceptor } from "../logging.interceptor";
 import { APP_INTERCEPTOR } from "@nestjs/core";
+import { RabbitmqModule } from "common/modules/rabbitmq.module";
+import { RabbitMqService } from "common/utils/rmq.service";
 
 @Module({
   imports: [
@@ -20,20 +22,9 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
       envFilePath: "./apps/orders/.env",
     }),
     PrometheusModule.register(),
-    ClientsModule.register([
-      {
-        name: "AUTH_SERVICE",
-        transport: Transport.RMQ,
-        options: {
-          urls: ["amqp://nestjs-rabbitmq:5672"],
-
-          queue: "notifications_queue",
-          queueOptions: {
-            durable: false,
-          },
-        },
-      },
-    ]),
+    RabbitmqModule,
+    RabbitmqModule.registerRmq("ORDERS_SERVICE", "orders_queue"),
+    RabbitmqModule.registerRmq("NOTIFICATION_SERVICE", "notification_queue"),
     RedisModule,
   ],
   controllers: [OrdersController],
@@ -45,21 +36,13 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
       useClass: LoggingInterceptor,
     },
     {
-      provide: "AUTH_CLIENT",
-      useFactory: () => {
-        return ClientProxyFactory.create({
-          transport: Transport.RMQ,
-          options: {
-            urls: ["amqp://nestjs-rabbitmq:5672"],
-
-            queue: "notifications_queue",
-            queueOptions: {
-              durable: false,
-            },
-          },
-        });
-      },
+      provide: "ORDERS_SERVICE",
+      useClass: RabbitMqService,
     },
+    {
+      provide: "NOTIFICATION_SERVICE",
+      useClass: RabbitMqService,
+    }
   ],
 })
-export class OrdersModule {}
+export class OrdersModule { }

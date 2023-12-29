@@ -1,9 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { RmqContext, RmqOptions, Transport } from "@nestjs/microservices";
+import { ClientProxy, ClientProxyFactory, RmqContext, RmqOptions, Transport } from "@nestjs/microservices";
 
 @Injectable()
 export class RabbitMqService {
-    constructor() { }
+
+    public client: ClientProxy;
+
+    constructor() {
+        this.client = ClientProxyFactory.create(this.getRmqOptions('notifications_queue'));
+    }
+
 
     getRmqOptions(queue: string): RmqOptions {
 
@@ -12,7 +18,7 @@ export class RabbitMqService {
             transport: Transport.RMQ,
             options: {
                 urls: [`amqp://nestjs-rabbitmq:5672`],
-                noAck: false,
+                noAck: true,
                 queue,
                 queueOptions: {
                     durable: true,
@@ -25,5 +31,9 @@ export class RabbitMqService {
         const channel = context.getChannelRef();
         const message = context.getMessage();
         channel.ack(message);
+    }
+
+    emit(client: any, pattern: string, data: any) {
+        return client.emit(pattern, data);
     }
 }
