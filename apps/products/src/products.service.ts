@@ -3,9 +3,9 @@ import { PrismaService } from "../../../common/database/prisma.service";
 import { CreateProductDto } from "../dto/create-product.dto";
 import { RedisCacheService } from "../../../common/services/redis-cache.service";
 import { RpcException } from '@nestjs/microservices';
-import { HttpExceptionFilter } from "common/utils/httpError";
+
 @Injectable()
-// @UseFilters(new HttpExceptionFilter())
+
 export class ProductsService {
   constructor(
     private prisma: PrismaService,
@@ -29,10 +29,11 @@ export class ProductsService {
       return products;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudieron obtener los productos" + error, HttpStatus.INTERNAL_SERVER_ERROR,
-
-      );
+      throw new RpcException({
+        message: 'No se pudo obtener los productos',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: error.message,
+      });
     }
   }
 

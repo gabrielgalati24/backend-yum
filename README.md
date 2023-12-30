@@ -12,10 +12,10 @@ docker-compose -f docker-compose.dev.yml up
 ```
 ## Products
 - GET todos los Productos: 
-  - URL: `http://localhost:3004/api/v1/products`
+  - URL: `http://localhost:3000/api/v1/products`
 
 - POST crear un Shop:
-  - URL: `http://localhost:3004/api/v1/shop/create`
+  - URL: `http://localhost:3000/api/v1/products/shop/create`
     - Body:
     ```json
     {
@@ -25,7 +25,7 @@ docker-compose -f docker-compose.dev.yml up
     ```
 
 - POST crear un producto: 
-  - URL: `http://localhost:3004/api/v1/products/create`
+  - URL: `http://localhost:3000/api/v1/products/create`
   - Body:
     ```json
     {
@@ -36,7 +36,7 @@ docker-compose -f docker-compose.dev.yml up
     ```
 
 - PATCH actualizar un prodcuto: 
-  - URL: `http://localhost:3004/api/v1/products/1`
+  - URL: `http://localhost:3000/api/v1/products/1`
   - Body:
     ```json
     {
@@ -46,15 +46,15 @@ docker-compose -f docker-compose.dev.yml up
     ```
 
 - GET un producto por ID: 
-  - URL: `http://localhost:3004/api/v1/products/1`
+  - URL: `http://localhost:3000/api/v1/products/1`
 
 Swagger
-- URL: `http://localhost:3004/api`
+- URL: `http://localhost:3000/api`
 
 
 ## Auth
 - POST crear un Usuario: 
-  - URL: `http://localhost:3001/api/v1/auth/register`
+  - URL: `http://localhost:3000/api/v1/auth/register`
   - Body:
     ```json
     {
@@ -66,11 +66,11 @@ Swagger
 
 
 ## Orders
-- GET todos los pedidos: 
-  - URL: `http://localhost:3003/api/v1/orders/`
+- GET todos las ordenes: 
+  - URL: `http://localhost:3000/api/v1/orders/`
 
-- POST crear un pedido: 
-  - URL: `http://localhost:3003/api/v1/orders/create`
+- POST crear una order: 
+  - URL: `http://localhost:3000/api/v1/orders/create`
   - Body:
     ```json
     {
@@ -80,8 +80,8 @@ Swagger
     }
     ```
 
-- PATCH actualizar un pedido: 
-  - URL: `http://localhost:3003/api/v1/orders/1`
+- PATCH actualizar una order 
+  - URL: `http://localhost:3000/api/v1/orders/1`
   - Body:
     ```json
     {
@@ -91,14 +91,14 @@ Swagger
     }
     ```
 
-- GET un pedido por ID: 
-  - URL: `http://localhost:3003/api/v1/orders/1`
+- GET un order por ID: 
+  - URL: `http://localhost:3000/api/v1/orders/1`
 
 Swagger
-- URL: `http://localhost:3003/api`
+- URL: `http://localhost:3003/api` #Desativate
 
 Metrics
-- URL: `http://localhost:3003/metrics`
+- URL: `http://localhost:3003/metrics` #Desativate
 
 Para ejecutar Los test se debe instalar las dependencias
 

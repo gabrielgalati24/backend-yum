@@ -11,9 +11,9 @@ import {
   ClientsModule,
   Transport,
 } from "@nestjs/microservices";
-import { RabbitMqService } from "common/utils/rmq.service";
-import { RmqModule } from "common/utils/rmq.module";
+
 import { RabbitmqModule } from "common/modules/rabbitmq.module";
+import { RabbitmqService } from "common/services/rabbitmq.service";
 
 @Module({
   imports: [
@@ -30,7 +30,7 @@ import { RabbitmqModule } from "common/modules/rabbitmq.module";
     PrismaService,
     {
       provide: "AUTH_SERVICE",
-      useClass: RabbitMqService,
+      useClass: RabbitmqService,
     }
   ],
 })

@@ -22,15 +22,14 @@ import {
   RmqContext,
 } from "@nestjs/microservices";
 import { CreateShopDto } from "../dto/create-shop.dto";
-import { RabbitMqService } from "common/utils/rmq.service";
-import { HttpExceptionFilter } from "common/utils/httpError";
-import { RpcException } from "@nestjs/microservices";
+import { RabbitmqService } from "../../../common/services/rabbitmq.service";
+
 @Controller("api")
 // @UseFilters(new RpcExceptionFilter())
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
-    @Inject("PRODUCTS_SERVICE") private readonly RabbitMqService: RabbitMqService,
+    @Inject("PRODUCTS_SERVICE") private readonly RabbitMqService: RabbitmqService,
   ) { }
 
   @MessagePattern({ cmd: 'get-products' })

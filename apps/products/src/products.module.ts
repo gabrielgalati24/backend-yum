@@ -11,7 +11,7 @@ import {
 import { RedisModule } from "common/modules/redis.module";
 import { RabbitmqModule } from "common/modules/rabbitmq.module";
 import { RabbitmqService } from "common/services/rabbitmq.service";
-import { RabbitMqService } from "common/utils/rmq.service";
+
 
 
 @Module({
@@ -32,7 +32,7 @@ import { RabbitMqService } from "common/utils/rmq.service";
 
     {
       provide: "PRODUCTS_SERVICE",
-      useClass: RabbitMqService,
+      useClass: RabbitmqService,
     }
 
   ],

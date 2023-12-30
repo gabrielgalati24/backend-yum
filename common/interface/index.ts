@@ -1,7 +1,7 @@
 
 import { RmqContext, RmqOptions } from '@nestjs/microservices';
 
-interface Order {
+export interface Order {
     id: number;
     delivered: boolean;
     userId: number;

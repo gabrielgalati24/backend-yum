@@ -13,7 +13,7 @@ import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 import { LoggingInterceptor } from "../logging.interceptor";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { RabbitmqModule } from "common/modules/rabbitmq.module";
-import { RabbitMqService } from "common/utils/rmq.service";
+import { RabbitmqService } from "common/services/rabbitmq.service";
 
 @Module({
   imports: [
@@ -37,12 +37,9 @@ import { RabbitMqService } from "common/utils/rmq.service";
     },
     {
       provide: "ORDERS_SERVICE",
-      useClass: RabbitMqService,
+      useClass: RabbitmqService,
     },
-    {
-      provide: "NOTIFICATION_SERVICE",
-      useClass: RabbitMqService,
-    }
+
   ],
 })
 export class OrdersModule { }

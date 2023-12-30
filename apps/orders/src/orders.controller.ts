@@ -1,46 +1,26 @@
-import {
-  Body,
-  Controller,
-  ExceptionFilter,
-  Get,
-  Inject,
-  Param,
-  Patch,
-  Post,
-  UseFilters,
-  UsePipes,
-  ValidationPipe,
-} from "@nestjs/common";
+import { Controller, Inject } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { CreateOrderDto } from "../dto/create-order.dto";
-import { UpdateOrderDto } from "../dto/update-order.dto";
-import {
-  ClientProxy,
-  Ctx,
-  MessagePattern,
-  Payload,
-  RmqContext,
-} from "@nestjs/microservices";
-import { RabbitMqService } from "common/utils/rmq.service";
-import { RpcExceptionFilter } from "common/utils/rcpError";
+import { RmqContext, MessagePattern, Ctx, Payload, } from "@nestjs/microservices";
+import { RabbitmqService } from "common/services/rabbitmq.service";
 
 
 @Controller("api")
 export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
-    @Inject("ORDERS_SERVICE") private readonly RabbitMqService: RabbitMqService,
+    @Inject("ORDERS_SERVICE") private readonly RabbitMqService: RabbitmqService,
   ) { }
-
   @MessagePattern({ cmd: 'get-orders' })
-  async getOrders(@Ctx() context: RmqContext): Promise<any[]> { // Specify the return type as 'Promise<Order[]>'
+  async getOrders(@Ctx() context: RmqContext): Promise<any[]> {
     this.RabbitMqService.acknowledgeMessage(context);
     return await this.ordersService.getOrders();
   }
 
   @MessagePattern({ cmd: 'create-order' })
-  async createOrder(@Ctx() context: RmqContext, @Payload() createOrderDto: CreateOrderDto): Promise<any[]> {
+  async createOrder(@Ctx() context: RmqContext, @Payload() createOrderDto: CreateOrderDto) {
     this.RabbitMqService.acknowledgeMessage(context);
+    console.log({ createOrderDto });
     return await this.ordersService.createOrder(createOrderDto);
   }
 
@@ -59,46 +39,3 @@ export class OrdersController {
   }
 }
 
-
-// import { Body, Controller, Get, Param, Patch, Post, Put } from "@nestjs/common";
-// import { OrdersService } from "./orders.service";
-// import { CreateOrderDto } from "../dto/create-order.dto";
-// import { UpdateOrderDto } from "../dto/update-order.dto";
-
-// @Controller("api")
-// export class OrdersController {
-//   constructor(private readonly ordersService: OrdersService) {}
-
-//   @Post("/v1/orders/create")
-//   async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<any> {
-//     return await this.ordersService.createOrder(createOrderDto);
-//   }
-
-//   @Get("/v1/orders")
-//   async getOrders(): Promise<any> {
-//     return await this.ordersService.getOrders();
-//   }
-
-//   @Get("/v1/orders/:id")
-//   async getOrderById(@Param("id") id: number): Promise<any> {
-//     return await this.ordersService.getOrderById(+id);
-//   }
-
-//   @Patch("/v1/orders/:id")
-//   async deliverOrder(
-//     @Param("id") id: number,
-//     @Body() updateOrderDto: UpdateOrderDto,
-//   ): Promise<any> {
-//     return await this.ordersService.updateOrder(+id, updateOrderDto);
-//   }
-
-//   @Get("/v1/orders/user/:id")
-//   async getOrdersByUser(@Param("id") id: number): Promise<any> {
-//     return await this.ordersService.getOrdersByUser(+id);
-//   }
-
-//   @Get("/v1/orders/user/:id/active")
-//   getOrdersActiveByUser(@Param("id") id: number): Promise<any> {
-//     return this.ordersService.getOrdersActiveByUser(+id);
-//   }
-// }

@@ -18,13 +18,12 @@ export class RabbitmqModule {
         const providers = [
             {
                 provide: service,
-                useFactory: () => {
-
-
+                useFactory: (configService: ConfigService) => {
+                    const rabbitmqUrl = configService.get<string>('RABBITMQ_URL');
                     return ClientProxyFactory.create({
                         transport: Transport.RMQ,
                         options: {
-                            urls: [`amqp://nestjs-rabbitmq:5672`],
+                            urls: [rabbitmqUrl],
                             queue,
                             queueOptions: {
                                 durable: true, // queue survives broker restart
@@ -32,7 +31,7 @@ export class RabbitmqModule {
                         },
                     });
                 },
-                inject: [],
+                inject: [ConfigService],
             },
         ];
 

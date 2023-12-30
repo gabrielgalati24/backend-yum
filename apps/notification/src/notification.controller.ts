@@ -20,13 +20,13 @@ export class NotificationController {
   messageHello(@Payload() data: any, @Ctx() context: RmqContext): string {
     return this.notificationService.sendEmail();
   }
-  @MessagePattern("order_delivered")
+  @EventPattern({ cmd: "order_delivered" })
   async orderDelivereds(
     @Ctx() context: RmqContext,
     @Payload() data: any,
   ): Promise<any> {
     const { orderId } = data;
-    console.log("order_delivered", orderId);
+
     return this.notificationService.sendInvoice(orderId);
   }
 }

@@ -17,6 +17,7 @@ export class OrdersController {
   createOrder(
     @Body() createOrderDto: CreateOrderDto
   ) {
+
     return this.ordersRabbitmq.send({ cmd: "create-order" }, createOrderDto);
   }
 

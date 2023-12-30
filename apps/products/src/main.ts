@@ -4,7 +4,7 @@ import { ConfigService } from "@nestjs/config";
 import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
-import { RabbitMqService } from "common/utils/rmq.service";
+
 import { RabbitmqService } from "common/services/rabbitmq.service";
 async function bootstrap() {
   const app = await NestFactory.create(ProductsModule);

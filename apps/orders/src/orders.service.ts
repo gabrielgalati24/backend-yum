@@ -4,20 +4,17 @@ import { CreateOrderDto } from "../dto/create-order.dto";
 
 import { ClientProxy, RpcException } from "@nestjs/microservices";
 import { RedisCacheService } from "common/services/redis-cache.service";
-import { RabbitMqService } from "common/utils/rmq.service";
-interface Order {
-  id: number;
-  delivered: boolean;
-  userId: number;
-  productId: number;
-}
+import { RabbitmqService } from "common/services/rabbitmq.service";
+import { Order } from "common/interface";
+
+
 @Injectable()
 export class OrdersService {
   constructor(
-    private prisma: PrismaService,
 
-    @Inject("NOTIFICATION_SERVICE") private readonly RabbitMqService: RabbitMqService,
+    @Inject("NOTIFICATION_SERVICE") private readonly productsRabbitmq: ClientProxy,
     private readonly cache: RedisCacheService,
+    private prisma: PrismaService,
 
   ) { }
 
@@ -43,10 +40,11 @@ export class OrdersService {
       return order;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudo crear el pedido",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new RpcException({
+        message: 'No se pudo crear el pedido',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: error.message,
+      });
     }
   }
 
@@ -65,10 +63,11 @@ export class OrdersService {
       return orders;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudieron obtener los pedidos",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new RpcException({
+        message: 'No se pudo obtener los pedidos',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: error.message,
+      });
     }
   }
 
@@ -90,10 +89,11 @@ export class OrdersService {
       return order;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudo obener el pedido",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new RpcException({
+        message: 'No se pudo obtener el pedido',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: error.message,
+      });
     }
   }
 
@@ -122,10 +122,9 @@ export class OrdersService {
       // Si el pedido no estaba entregado emite el evento order_delivered para enviar la factura
       if (delivered && !currentOrder.delivered) {
 
-        this.RabbitMqService.emit(this.RabbitMqService.client, "order_delivered", {
-          orderId: id,
-        });
-
+        console.log("Emitting order_delivered event", order);
+        // await this.RabbitMqService.emitMessage("order_delivered", order);
+        this.productsRabbitmq.emit({ cmd: "order_delivered" }, order);
       }
 
       // Invalida la cache despues de actualizar un pedido
@@ -169,10 +168,11 @@ export class OrdersService {
       return orders;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
-        "No se pudieron obtener los pedidos",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new RpcException({
+        message: 'No se pudieron obtener los pedidos',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: error.message,
+      });
     }
   }
 
@@ -195,9 +195,9 @@ export class OrdersService {
       return orders;
     } catch (error) {
       console.error(error);
-      throw new HttpException(
+      throw new RpcException(
         "No se pudieron obtener los pedidos",
-        HttpStatus.INTERNAL_SERVER_ERROR,
+
       );
     }
   }
