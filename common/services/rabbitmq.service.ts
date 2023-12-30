@@ -20,7 +20,7 @@ export class RabbitmqService implements RabbitmqServiceInterface {
             options: {
 
                 urls: [this.configService.get<string>('RABBITMQ_URL')],
-                noAck: false,
+                noAck: true,
                 queue,
                 queueOptions: {
                     durable: true,
