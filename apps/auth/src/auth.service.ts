@@ -4,14 +4,15 @@ import {
   HttpStatus,
   Injectable,
   UnauthorizedException,
-} from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { PrismaService } from 'common/database/prisma.service';
+} from "@nestjs/common";
+import { RpcException } from "@nestjs/microservices";
+import { Prisma } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { PrismaService } from "common/database/prisma.service";
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async login(createUserDto): Promise<any> {
     try {
@@ -21,11 +22,11 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new UnauthorizedException('Usuario no encontrado');
+        throw new UnauthorizedException("Usuario no encontrado");
       }
 
       if (user.password !== password) {
-        throw new UnauthorizedException('Contraseña incorrecta');
+        throw new UnauthorizedException("Contraseña incorrecta");
       }
 
       return {
@@ -34,7 +35,7 @@ export class AuthService {
     } catch (error) {
       console.error(error);
       throw new HttpException(
-        'No se pudo iniciar sesión',
+        "No se pudo iniciar sesión",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -42,7 +43,7 @@ export class AuthService {
 
   async register(createUserDto): Promise<any> {
     try {
-      const { email, password, name = '' } = createUserDto;
+      const { email, password, name = "" } = createUserDto;
       const user = await this.prisma.user.create({
         data: {
           name,
@@ -55,12 +56,17 @@ export class AuthService {
       console.error(error);
       if (
         error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2002'
+        error.code === "P2002"
       ) {
-        throw new ConflictException('El correo electrónico ya existe');
+        // throw new ConflictException("El correo electrónico ya existe");
+        throw new RpcException({
+          message: 'El correo electrónico ya existe',
+          statusCode: HttpStatus.CONFLICT,
+          error: error.message,
+        });
       }
       throw new HttpException(
-        'No se pudo registrar el usuario',
+        "No se pudo registrar el usuario",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

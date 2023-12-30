@@ -11,15 +11,15 @@ import { CacheModule } from '@nestjs/cache-manager';
     CacheModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
         store: await redisStore({
-          url: "redis://redis:6379",
+          url: configService.get<string>('REDIS_URL'),
         }),
       }),
       isGlobal: true,
       inject: [ConfigService],
     }),
-
   ],
   providers: [RedisCacheService],
   exports: [RedisCacheService],
 })
 export class RedisModule { }
+

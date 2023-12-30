@@ -1,28 +1,27 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { ClientProxy } from '@nestjs/microservices';
+import { Body, Controller, Get, Inject, Post } from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import { CreateUserDto } from "../dto/create-user.dto";
+import { ClientProxy, Ctx, MessagePattern, RmqContext } from "@nestjs/microservices";
+import { RabbitmqService } from "common/services/rabbitmq.service";
 
-@Controller('api')
+@Controller("api")
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    @Inject('AUTH_CLIENT') private readonly client: ClientProxy,
-  ) {}
+    @Inject("AUTH_SERVICE") private readonly RabbitMqService: RabbitmqService,
 
-  @Post('/v1/auth/login')
-  async login(@Body() createUserDto: CreateUserDto) {
+  ) { }
+
+  @MessagePattern({ cmd: 'login' })
+  async login(@Ctx() context: RmqContext, @Body() createUserDto: CreateUserDto) {
+    this.RabbitMqService.acknowledgeMessage(context);
     return await this.authService.login(createUserDto);
   }
 
-  @Post('/v1/auth/register')
-  async register(@Body() createUserDto: CreateUserDto) {
+  @MessagePattern({ cmd: 'register' })
+  async register(@Ctx() context: RmqContext, @Body() createUserDto: CreateUserDto) {
+    this.RabbitMqService.acknowledgeMessage(context);
     return await this.authService.register(createUserDto);
   }
 
-  @Get('')
-  async a(@Body() createUserDto: CreateUserDto) {
-    console.log('a');
-    return 'a';
-  }
 }

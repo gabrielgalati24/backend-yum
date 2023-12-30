@@ -1,9 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { RabbitMqService } from './rmq.service';
-
-
+import { RabbitmqService } from 'common/services/rabbitmq.service';
 
 @Module({
     imports: [
@@ -12,26 +10,23 @@ import { RabbitMqService } from './rmq.service';
             envFilePath: './.env',
         }),
     ],
-    providers: [RabbitMqService],
-    exports: [RabbitMqService],
+    providers: [RabbitmqService],
+    exports: [RabbitmqService],
 })
-export class RmqModule {
+export class RabbitmqModule {
     static registerRmq(service: string, queue: string): DynamicModule {
         const providers = [
             {
                 provide: service,
                 useFactory: (configService: ConfigService) => {
-                    const USER = configService.get('RABBITMQ_USER');
-                    const PASSWORD = configService.get('RABBITMQ_PASS');
-                    const HOST = configService.get('RABBITMQ_HOST');
-
+                    const rabbitmqUrl = configService.get<string>('RABBITMQ_URL');
                     return ClientProxyFactory.create({
                         transport: Transport.RMQ,
                         options: {
-                            urls: [`amqp://${USER}:${PASSWORD}@${HOST}`],
+                            urls: [rabbitmqUrl],
                             queue,
                             queueOptions: {
-                                durable: true,
+                                durable: true, // queue survives broker restart
                             },
                         },
                     });
@@ -41,7 +36,7 @@ export class RmqModule {
         ];
 
         return {
-            module: RmqModule,
+            module: RabbitmqModule,
             providers,
             exports: providers,
         };

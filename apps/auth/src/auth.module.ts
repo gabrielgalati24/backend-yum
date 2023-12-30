@@ -1,58 +1,37 @@
-import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { ConfigModule } from '@nestjs/config';
+import { Module } from "@nestjs/common";
+import { AuthController } from "./auth.controller";
+import { AuthService } from "./auth.service";
+import { ConfigModule } from "@nestjs/config";
 
-import { PrismaService } from 'common/database/prisma.service';
+import { PrismaService } from "common/database/prisma.service";
 import {
   Client,
   ClientProxy,
   ClientProxyFactory,
   ClientsModule,
   Transport,
-} from '@nestjs/microservices';
-import { RabbitMqService } from 'common/utils/rmq.service';
-import { RmqModule } from 'common/utils/rmq.module';
+} from "@nestjs/microservices";
+
+import { RabbitmqModule } from "common/modules/rabbitmq.module";
+import { RabbitmqService } from "common/services/rabbitmq.service";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: './apps/auth/.env',
+      envFilePath: "./apps/auth/.env",
     }),
-    ClientsModule.register([
-      {
-        name: 'AUTH_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://nestjs-rabbitmq:5672'],
-          queue: 'auth_queue',
-          queueOptions: {
-            durable: false,
-          },
-        },
-      },
-    ]),
+
+    RabbitmqModule.registerRmq("AUTH_SERVICE", "auth_queue"),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     PrismaService,
     {
-      provide: 'AUTH_CLIENT',
-      useFactory: () => {
-        return ClientProxyFactory.create({
-          transport: Transport.RMQ,
-          options: {
-            urls: ['amqp://nestjs-rabbitmq:5672'],
-            queue: 'auth_queue',
-            queueOptions: {
-              durable: false,
-            },
-          },
-        });
-      },
-    },
+      provide: "AUTH_SERVICE",
+      useClass: RabbitmqService,
+    }
   ],
 })
-export class AuthModule {}
+export class AuthModule { }

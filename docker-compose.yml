@@ -1,0 +1,21 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:alpine3.19
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+
+  redis:
+    container_name: redis
+    image: redis:alpine3.19
+    ports:
+      - '6379:6379'
+
+  nestjs-rabbitmq:
+    container_name: nestjs-rabbitmq
+    image: rabbitmq:3.9.29-management-alpine
+    ports:
+      - '5672:5672'
+      - '15672:15672'
