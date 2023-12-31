@@ -13,13 +13,13 @@ export class AuthController {
   ) { }
 
   @Post("login")
-  async login(@Body() createUserDto: CreateUserDto) {
-    return await this.authRabbitmq.send({ cmd: "login" }, createUserDto);
+  login(@Body() createUserDto: CreateUserDto) {
+    return this.authRabbitmq.send({ cmd: "login" }, createUserDto);
   }
 
   @Post("register")
-  async register(@Body() createUserDto: CreateUserDto) {
-    return await this.authRabbitmq.send({ cmd: "register" }, createUserDto);
+  register(@Body() createUserDto: CreateUserDto) {
+    return this.authRabbitmq.send({ cmd: "register" }, createUserDto);
   }
 
 }

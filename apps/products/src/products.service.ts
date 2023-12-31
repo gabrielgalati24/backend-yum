@@ -14,9 +14,8 @@ export class ProductsService {
 
   async getProducts() {
     try {
-      // const x = this.prisma.shop.findMany();
-      // console.log(x);
-      console.log("getProducts");
+
+
       let products = await this.cache.get("products");
       if (!products) {
         products = await this.prisma.product.findMany({
