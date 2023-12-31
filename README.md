@@ -1,5 +1,5 @@
 # Proyecto de Backend de Delivery con Microservicios y Docker Compose
-
+  ## no ack Rabbitmq version
 Stack: Nestjs, Rabbitmq, Redis, Postgresql
 
 Para ejecutar este proyecto,  necesitas tener Docker y Docker Compose instalados en tu máquina y node . Luego, puedes iniciar todos los servicios con estos comandos:
