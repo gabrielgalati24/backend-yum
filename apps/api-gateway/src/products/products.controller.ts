@@ -3,8 +3,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nest
 
 
 import { ClientProxy } from '@nestjs/microservices';
-import { CreateProductDto } from 'apps/products/dto/create-product.dto';
-import { CreateShopDto } from 'apps/products/dto/create-shop.dto';
+import { CreateProductDto } from './dto/create-product.dto';
+import { CreateShopDto } from './dto/create-shop.dto';
+
 
 @Controller('api/v1/products')
 export class ProductsController {
