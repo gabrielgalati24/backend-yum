@@ -33,16 +33,12 @@ export class ProductsController {
   ) { }
 
   @MessagePattern({ cmd: 'get-products' })
-  async getProducts(@Ctx() context: RmqContext) {
-
-    this.RabbitMqService.acknowledgeMessage(context);
-
+  async getProducts() {
     return await this.productsService.getProducts();
   }
 
   @MessagePattern({ cmd: 'create-product' })
   async createProduct(@Ctx() context: RmqContext, @Payload() createProductDto: CreateProductDto) {
-    this.RabbitMqService.acknowledgeMessage(context);
 
     return await this.productsService.createProduct(createProductDto);
   }
@@ -58,7 +54,7 @@ export class ProductsController {
   @MessagePattern({ cmd: 'get-product-by-id' })
   async getProductById(@Ctx() context: RmqContext, @Payload() id: number) {
 
-    this.RabbitMqService.acknowledgeMessage(context);
+
 
     return await this.productsService.getProductById(+id);
   }
@@ -68,7 +64,7 @@ export class ProductsController {
     @Ctx() context: RmqContext,
     @Payload() data: any,
   ) {
-    this.RabbitMqService.acknowledgeMessage(context);
+
 
     const { id, ...updateProductDto } = data;
 

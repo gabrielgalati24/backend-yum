@@ -49,7 +49,7 @@ describe("ProductsController", () => {
       ];
       jest.spyOn(service, "getProducts").mockResolvedValue(products);
 
-      const result = await controller.getProducts(mockRmqContext);
+      const result = await controller.getProducts();
 
       expect(result).toEqual(products);
     });

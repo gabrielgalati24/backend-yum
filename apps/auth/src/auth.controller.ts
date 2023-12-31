@@ -14,13 +14,13 @@ export class AuthController {
 
   @MessagePattern({ cmd: 'login' })
   async login(@Ctx() context: RmqContext, @Body() createUserDto: CreateUserDto) {
-    this.RabbitMqService.acknowledgeMessage(context);
+
     return await this.authService.login(createUserDto);
   }
 
   @MessagePattern({ cmd: 'register' })
   async register(@Ctx() context: RmqContext, @Body() createUserDto: CreateUserDto) {
-    this.RabbitMqService.acknowledgeMessage(context);
+
     return await this.authService.register(createUserDto);
   }
 

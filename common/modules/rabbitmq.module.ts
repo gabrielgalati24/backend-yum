@@ -25,6 +25,7 @@ export class RabbitmqModule {
                         options: {
                             urls: [rabbitmqUrl],
                             queue,
+                            noAck: true,
                             queueOptions: {
                                 durable: true, // queue survives broker restart
                             },
