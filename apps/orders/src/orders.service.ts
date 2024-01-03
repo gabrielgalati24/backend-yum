@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Inject, Injectable } from "@nestjs/common";
-import { PrismaService } from "common/database/prisma.service";
+import { PrismaService } from "../../../common/database/prisma.service";
 import { CreateOrderDto } from "../dto/create-order.dto";
 
 import { ClientProxy, RpcException } from "@nestjs/microservices";
-import { RedisCacheService } from "common/services/redis-cache.service";
+import { RedisCacheService } from "../../../common/services/redis-cache.service";
 import { RabbitmqService } from "common/services/rabbitmq.service";
 import { Order } from "common/interface";
 

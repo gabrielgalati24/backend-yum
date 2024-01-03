@@ -2,7 +2,7 @@ import { Controller, Inject } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { CreateOrderDto } from "../dto/create-order.dto";
 import { RmqContext, MessagePattern, Ctx, Payload, } from "@nestjs/microservices";
-import { RabbitmqService } from "common/services/rabbitmq.service";
+import { RabbitmqService } from "../../../common/services/rabbitmq.service";
 
 
 @Controller("api")
@@ -21,7 +21,7 @@ export class OrdersController {
   @MessagePattern({ cmd: 'create-order' })
   async createOrder(@Ctx() context: RmqContext, @Payload() createOrderDto: CreateOrderDto) {
 
-    console.log({ createOrderDto });
+
     return await this.ordersService.createOrder(createOrderDto);
   }
 
