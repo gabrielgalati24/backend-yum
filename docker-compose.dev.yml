@@ -15,7 +15,7 @@ services:
 
   nestjs-rabbitmq:
     container_name: nestjs-rabbitmq
-    image: rabbitmq:3.9.29-management-alpine
+    image: rabbitmq:4.0.8-management-alpine
     ports:
       - '5672:5672'
       - '15672:15672'
@@ -99,7 +99,7 @@ services:
         npx prisma migrate deploy && npx prisma generate && npm run start:dev api-gateway 
         "
       ports:
-        - '3000:3000'
+        - '3010:3000'
       env_file:
         - ./apps/api-gateway/.env
       depends_on:
